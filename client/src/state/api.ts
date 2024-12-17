@@ -53,8 +53,8 @@ export type Task = {
   projectId?: number;
   authorUserId?: number;
   assignedUserId?: number;
-  author?: UserActivation;
-  asignee?: UserActivation;
+  author?: User;
+  assignee?: User;
   comments?: Comment[];
   attachments?: Attachment[];
 };

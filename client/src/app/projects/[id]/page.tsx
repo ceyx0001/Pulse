@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import ProjectHeader from "@/app/projects/ProjectHeader";
 import Board from "../BoardView";
 
 type ProjectProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 enum Tabs {
@@ -13,7 +13,7 @@ enum Tabs {
 }
 
 const Project = ({ params }: ProjectProps) => {
-  const { id } = params;
+  const { id } = use(params);
   const [activeTab, setActiveTab] = useState(Tabs.board as string);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
