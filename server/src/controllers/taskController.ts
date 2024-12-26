@@ -58,7 +58,9 @@ export const postTask = async (req: Request, res: Response): Promise<void> => {
     });
     res.status(201).json(newTask);
   } catch (error: any) {
-    res.status(500).json({ error: parsePrismaError(error, "Error creating task.") });
+    res
+      .status(500)
+      .json({ error: parsePrismaError(error, "Error creating task.") });
   }
 };
 
@@ -79,6 +81,34 @@ export const updateTaskStatus = async (
     });
     res.status(200).json(updatedTask);
   } catch (error: any) {
-    res.status(500).json({ error: parsePrismaError(error, "Error updating task status.") });
+    res
+      .status(500)
+      .json({ error: parsePrismaError(error, "Error updating task status.") });
+  }
+};
+
+export const getUserTasks = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const tasks = await prisma.task.findMany({
+      where: {
+        OR: [
+          { authorUserId: Number(userId) },
+          { assignedUserId: Number(userId) },
+        ],
+      },
+      include: {
+        author: true,
+        assignee: true,
+      },
+    });
+    res.status(200).json(tasks);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ error: parsePrismaError(error, "Error getting user tasks.") });
   }
 };
