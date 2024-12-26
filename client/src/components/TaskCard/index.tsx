@@ -21,6 +21,10 @@ const TaskCard = ({ task }: Props) => {
                 width={400}
                 height={200}
                 className="rounded-md"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.style.display = "none";
+                }}
               />
             )}
           </div>

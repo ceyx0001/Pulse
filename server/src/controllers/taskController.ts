@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { parsePrismaError } from "../lib/utils";
 
 const prisma = new PrismaClient();
 
@@ -19,7 +20,9 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
     });
     res.status(200).json(tasks);
   } catch (error: any) {
-    res.status(500).json(`Error fetching task:` + error.message);
+    res
+      .status(500)
+      .json({ error: parsePrismaError(error, "Error getting tasks.") });
   }
 };
 
@@ -55,7 +58,7 @@ export const postTask = async (req: Request, res: Response): Promise<void> => {
     });
     res.status(201).json(newTask);
   } catch (error: any) {
-    res.status(500).json(`Error creating task:` + error.message);
+    res.status(500).json({ error: parsePrismaError(error, "Error creating task.") });
   }
 };
 
@@ -76,6 +79,6 @@ export const updateTaskStatus = async (
     });
     res.status(200).json(updatedTask);
   } catch (error: any) {
-    res.status(500).json(`Error updating task:` + error.message);
+    res.status(500).json({ error: parsePrismaError(error, "Error updating task status.") });
   }
 };

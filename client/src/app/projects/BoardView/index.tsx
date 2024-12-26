@@ -1,5 +1,5 @@
 import React from "react";
-import { useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
+import { Status, useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Task as TaskType } from "@/state/api";
@@ -7,15 +7,15 @@ import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { Priority as PriorityTypes } from "@/state/api";
 import Image from "next/image";
-
-type BoardProps = {
-  id: string;
-  setIsModalOpen: (isOpen: boolean) => void;
-};
+import { ViewProps } from "@/types";
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
-const Board = ({ id, setIsModalOpen }: BoardProps) => {
+const Board = ({
+  id,
+  setIsModalOpen,
+  setDefaultStatus,
+}: ViewProps & { setDefaultStatus: (status: Status) => void }) => {
   const {
     data: tasks,
     isLoading,
@@ -40,6 +40,7 @@ const Board = ({ id, setIsModalOpen }: BoardProps) => {
             tasks={tasks || []}
             moveTask={moveTask}
             setIsModalOpen={setIsModalOpen}
+            setDefaultStatus={setDefaultStatus}
           />
         ))}
       </div>
@@ -52,6 +53,7 @@ type TaskColumnProps = {
   tasks: TaskType[];
   moveTask: (taskId: number, toStatus: string) => void;
   setIsModalOpen: (isOpen: boolean) => void;
+  setDefaultStatus: (status: Status) => void;
 };
 
 const TaskColumn = ({
@@ -59,6 +61,7 @@ const TaskColumn = ({
   tasks,
   moveTask,
   setIsModalOpen,
+  setDefaultStatus,
 }: TaskColumnProps) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "task",
@@ -103,7 +106,10 @@ const TaskColumn = ({
             </button>
             <button
               className="flex h-6 w-6 items-center justify-center rounded bg-gray-200 dark:bg-dark-tertiary dark:text-white"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setIsModalOpen(true);
+                setDefaultStatus(Status[status.replace(/\s+/g, '') as keyof typeof Status]);
+              }}
             >
               <Plus size={16} />
             </button>

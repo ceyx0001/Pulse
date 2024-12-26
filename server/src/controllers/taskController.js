@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateTaskStatus = exports.postTask = exports.getTasks = void 0;
 const client_1 = require("@prisma/client");
+const utils_1 = require("../lib/utils");
 const prisma = new client_1.PrismaClient();
 const getTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -29,7 +30,9 @@ const getTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).json(tasks);
     }
     catch (error) {
-        res.status(500).json(`Error fetching task:` + error.message);
+        res
+            .status(500)
+            .json({ error: (0, utils_1.parsePrismaError)(error, "Error getting tasks.") });
     }
 });
 exports.getTasks = getTasks;
@@ -54,7 +57,7 @@ const postTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(201).json(newTask);
     }
     catch (error) {
-        res.status(500).json(`Error creating task:` + error.message);
+        res.status(500).json({ error: (0, utils_1.parsePrismaError)(error, "Error creating task.") });
     }
 });
 exports.postTask = postTask;
@@ -73,7 +76,7 @@ const updateTaskStatus = (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(200).json(updatedTask);
     }
     catch (error) {
-        res.status(500).json(`Error updating task:` + error.message);
+        res.status(500).json({ error: (0, utils_1.parsePrismaError)(error, "Error updating task status.") });
     }
 });
 exports.updateTaskStatus = updateTaskStatus;
