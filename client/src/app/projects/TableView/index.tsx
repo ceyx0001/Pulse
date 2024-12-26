@@ -1,6 +1,6 @@
 import { useAppSelector } from "@/app/redux";
 import { useGetTasksQuery } from "@/state/api";
-import { ViewProps } from "@/types";
+import { ViewProps } from "@/lib/types";
 import React from "react";
 import Header from "@/components/Header";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";

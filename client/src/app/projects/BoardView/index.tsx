@@ -7,7 +7,7 @@ import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { Priority as PriorityTypes } from "@/state/api";
 import Image from "next/image";
-import { ViewProps } from "@/types";
+import { ViewProps } from "@/lib/types";
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
