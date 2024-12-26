@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import { Task, useGetTasksQuery } from "@/state/api";
 import TaskCard from "@/components/TaskCard";
 import React from "react";
-import { ViewProps } from "@/types";
+import { ViewProps } from "@/lib/types";
 
 const List = ({ id, setIsModalOpen }: ViewProps) => {
   const {
