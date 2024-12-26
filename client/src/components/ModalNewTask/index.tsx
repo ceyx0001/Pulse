@@ -82,7 +82,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null, defaultStatus }: Props) => {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
           <select
             className={selectStyles}
-            value={status || defaultStatus}
+            value={defaultStatus || status}
             onChange={(e) =>
               setStatus(Status[e.target.value as keyof typeof Status])
             }

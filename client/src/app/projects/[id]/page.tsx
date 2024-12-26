@@ -32,7 +32,7 @@ const Project = ({ params }: ProjectProps) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         id={id}
-        defaultStatus={defaultStatus}
+        defaultStatus={activeTab === Tabs.board ? defaultStatus : undefined}
       />
 
       <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
