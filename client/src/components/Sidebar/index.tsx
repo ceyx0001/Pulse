@@ -172,7 +172,6 @@ const SidebarLink = ({
   const pathname = usePathname();
   const isActive =
     pathname === href || (pathname === "/" && href === "/dashboard");
-  const screenWidth = window.innerWidth;
 
   return (
     <Link href={href} className="w-full">

@@ -16,6 +16,10 @@ const UserCard = ({ user }: Props) => {
           width={32}
           height={32}
           className="rounded-full"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.style.display = "none";
+          }}
         />
       )}
       <div>
