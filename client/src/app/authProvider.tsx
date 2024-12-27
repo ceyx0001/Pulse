@@ -19,47 +19,45 @@ const formFields = {
       order: 1,
       placeholder: "Enter your username",
       label: "Username",
-      isRequired: true
+      isRequired: true,
     },
     email: {
       order: 1,
       placeholder: "Enter your email address",
       label: "Email",
       type: "email",
-      isRequired: true
+      isRequired: true,
     },
     password: {
       order: 1,
       placeholder: "Enter your password",
       label: "Password",
       type: "password",
-      isRequired: true
+      isRequired: true,
     },
     confirm_password: {
       order: 1,
       placeholder: "Confirm your password",
       label: "Confirm Password",
       type: "password",
-      isRequired: true
+      isRequired: true,
     },
   },
 };
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="mt-5">
-      <Authenticator formFields={formFields}>
-        {({ user }) =>
-          user ? (
-            <div>{children}</div>
-          ) : (
-            <div>
-              <h1>Please sign in below:</h1>
-            </div>
-          )
-        }
-      </Authenticator>
-    </div>
+    <Authenticator formFields={formFields}>
+      {({ user }) =>
+        user ? (
+          <div>{children}</div>
+        ) : (
+          <div>
+            <h1>Please sign in below:</h1>
+          </div>
+        )
+      }
+    </Authenticator>
   );
 };
 
