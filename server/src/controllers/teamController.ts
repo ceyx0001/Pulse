@@ -28,7 +28,7 @@ export const getTeams = async (req: Request, res: Response): Promise<void> => {
       })
     );
 
-    res.json(teamsWithUsernames);
+    res.status(200).json(teamsWithUsernames);
   } catch (error: any) {
     res.status(500).json({ error: parsePrismaError(error, "Error getting teams.") });
   }

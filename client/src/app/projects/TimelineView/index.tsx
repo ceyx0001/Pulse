@@ -42,8 +42,8 @@ const Timeline = ({ id, setIsModalOpen }: ViewProps) => {
     }));
   };
 
-  if (isLoading) return <span>Loading...</span>;
-  if (error) return <span>Error while fetching tasks.</span>;
+  if (isLoading) return <span className="text-gray-500">Loading...</span>;
+  if (error) return <span className="text-red-500">Error while fetching tasks.</span>;
 
   return (
     <div className="px-4 xl:px-6">

@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany();
-    res.json(users);
+    res.status(200).json(users);
   } catch (error: any) {
     res
       .status(500)
@@ -24,7 +24,7 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
-    res.json(user);
+    res.status(200).json(user);
   } catch (error: any) {
     res
       .status(500)
@@ -48,7 +48,7 @@ export const postUser = async (req: Request, res: Response) => {
         teamId,
       },
     });
-    res.json({ message: "User Created Successfully", newUser });
+    res.status(201).json({ message: "User Created Successfully", newUser });
   } catch (error: any) {
     res
       .status(500)

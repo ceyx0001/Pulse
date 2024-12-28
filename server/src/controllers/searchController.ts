@@ -54,7 +54,7 @@ export const search = async (req: Request, res: Response): Promise<void> => {
       response.userError = parsePrismaError(usersResult.reason, "Error searching users.");
     }
 
-    res.json(response);
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).json({ error: "An unexpected error occurred during search." });
   }

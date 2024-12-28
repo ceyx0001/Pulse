@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserTasks = exports.updateTaskStatus = exports.postTask = exports.getTasks = void 0;
+exports.deleteTask = exports.getUserTasks = exports.updateTaskStatus = exports.postTask = exports.getTasks = void 0;
 const client_1 = require("@prisma/client");
 const utils_1 = require("../lib/utils");
 const prisma = new client_1.PrismaClient();
@@ -108,3 +108,33 @@ const getUserTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getUserTasks = getUserTasks;
+const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { taskId, userId } = req.params;
+        const task = yield prisma.task.findUnique({
+            where: {
+                id: Number(taskId),
+            },
+        });
+        if (!task) {
+            res.status(404).json({ error: "Task not found" });
+            return;
+        }
+        if (task.authorUserId !== Number(userId)) {
+            res.status(403).json({ error: "Not authorized to delete this task" });
+            return;
+        }
+        yield prisma.task.delete({
+            where: {
+                id: Number(taskId),
+            },
+        });
+        res.status(204).send();
+    }
+    catch (error) {
+        res
+            .status(500)
+            .json({ error: (0, utils_1.parsePrismaError)(error, "Error deleting task.") });
+    }
+});
+exports.deleteTask = deleteTask;

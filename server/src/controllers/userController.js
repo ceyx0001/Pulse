@@ -16,7 +16,7 @@ const prisma = new client_1.PrismaClient();
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield prisma.user.findMany();
-        res.json(users);
+        res.status(200).json(users);
     }
     catch (error) {
         res
@@ -33,7 +33,7 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 cognitoId: cognitoId,
             },
         });
-        res.json(user);
+        res.status(200).json(user);
     }
     catch (error) {
         res
@@ -53,7 +53,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 teamId,
             },
         });
-        res.json({ message: "User Created Successfully", newUser });
+        res.status(201).json({ message: "User Created Successfully", newUser });
     }
     catch (error) {
         res

@@ -61,7 +61,7 @@ const search = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             console.error('User search error:', usersResult.reason);
             response.userError = (0, utils_1.parsePrismaError)(usersResult.reason, "Error searching users.");
         }
-        res.json(response);
+        res.status(200).json(response);
     }
     catch (error) {
         res.status(500).json({ error: "An unexpected error occurred during search." });

@@ -27,7 +27,7 @@ const getTeams = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
             return Object.assign(Object.assign({}, team), { productOwnerUsername: productOwner === null || productOwner === void 0 ? void 0 : productOwner.username, projectManagerUsername: projectManager === null || projectManager === void 0 ? void 0 : projectManager.username });
         })));
-        res.json(teamsWithUsernames);
+        res.status(200).json(teamsWithUsernames);
     }
     catch (error) {
         res.status(500).json({ error: (0, utils_1.parsePrismaError)(error, "Error getting teams.") });

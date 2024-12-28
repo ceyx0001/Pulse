@@ -40,8 +40,16 @@ const Timeline = () => {
     }));
   };
 
-  if (isLoading) return <span>Loading...</span>;
-  if (isError || !projects) return <span>Error while fetching projects.</span>;
+  if (isLoading) return (
+    <div className="flex h-screen items-center justify-center">
+      <span className="text-gray-500">Loading...</span>
+    </div>
+  );
+  if (isError || !projects) return (
+    <div className="flex h-screen items-center justify-center">
+      <span className="text-red-500">Error while fetching projects.</span>
+    </div>
+  );
 
   return (
     <div className="max-w-full p-8">

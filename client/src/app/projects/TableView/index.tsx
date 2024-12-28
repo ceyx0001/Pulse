@@ -45,8 +45,8 @@ const Table = ({ id, setIsModalOpen }: ViewProps) => {
     isLoading,
   } = useGetTasksQuery({ projectId: Number(id) });
 
-  if (isLoading) return <span>Loading...</span>;
-  if (error) return <span>Error while fetching tasks.</span>;
+  if (isLoading) return <span className="text-gray-500">Loading...</span>;
+  if (error) return <span className="text-red-500">Error while fetching tasks.</span>;
 
   return (
     <div className="h-[540px] w-full px-4 pb-8 xl:px-6">

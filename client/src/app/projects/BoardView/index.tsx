@@ -1,5 +1,10 @@
-import React from "react";
-import { Status, useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
+import React, { useState } from "react";
+import {
+  Status,
+  useDeleteTaskMutation,
+  useGetTasksQuery,
+  useUpdateTaskStatusMutation,
+} from "@/state/api";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Task as TaskType } from "@/state/api";
@@ -8,6 +13,7 @@ import { format } from "date-fns";
 import { Priority as PriorityTypes } from "@/state/api";
 import Image from "next/image";
 import { ViewProps } from "@/lib/types";
+import { Popover } from "@mui/material";
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
@@ -27,8 +33,9 @@ const Board = ({
     updateTaskStatus({ taskId, status: toStatus });
   };
 
-  if (isLoading) return <span>Loading...</span>;
-  if (error) return <span>Error while fetching tasks.</span>;
+  if (isLoading) return <span className="text-gray-500">Loading...</span>;
+  if (error)
+    return <span className="text-red-500">Error while fetching tasks.</span>;
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -108,7 +115,9 @@ const TaskColumn = ({
               className="flex h-6 w-6 items-center justify-center rounded bg-gray-200 dark:bg-dark-tertiary dark:text-white"
               onClick={() => {
                 setIsModalOpen(true);
-                setDefaultStatus(Status[status.replace(/\s+/g, '') as keyof typeof Status]);
+                setDefaultStatus(
+                  Status[status.replace(/\s+/g, "") as keyof typeof Status],
+                );
               }}
             >
               <Plus size={16} />
@@ -136,6 +145,9 @@ const Task = ({ task }: TaskProps) => {
     item: { id: task.id },
     collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
   }));
+  const [deleteTask] = useDeleteTaskMutation();
+  const [updateTaskStatus] = useUpdateTaskStatusMutation();
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const taskTagsSplit = task.tags ? task.tags.split(",") : [];
   const formattedStartDate = task.startDate
@@ -162,6 +174,26 @@ const Task = ({ task }: TaskProps) => {
       {priority}
     </div>
   );
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
+
+  const handleTaskClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMarkAsDone = () => {
+    updateTaskStatus({ taskId: task.id, status: "Completed" });
+    setAnchorEl(null);
+  };
+
+  const handleDeleteTask = () => {
+    deleteTask(task.id);
+    setAnchorEl(null);
+  };
 
   return (
     <div
@@ -196,9 +228,37 @@ const Task = ({ task }: TaskProps) => {
             </div>
           </div>
 
-          <button className="flex h-6 w-4 flex-shrink-0 items-center justify-center dark:text-neutral-500">
+          <button
+            className="flex h-6 w-4 flex-shrink-0 items-center justify-center dark:text-neutral-500"
+            onClick={handleTaskClick}
+          >
             <EllipsisVertical size={26} />
           </button>
+          <Popover
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+          >
+            <div className="flex flex-col gap-2 border border-stroke-dark p-1 dark:bg-dark-bg dark:text-white">
+              <button
+                className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
+                onClick={handleMarkAsDone}
+              >
+                Mark as done
+              </button>
+              <button
+                className="rounded p-1 text-white transition-colors duration-100 ease-in-out hover:bg-red-500"
+                onClick={handleDeleteTask}
+              >
+                Delete
+              </button>
+            </div>
+          </Popover>
         </div>
 
         <div className="my-3 flex justify-between">
