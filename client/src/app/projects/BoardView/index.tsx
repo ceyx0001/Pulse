@@ -15,6 +15,7 @@ import { Priority as PriorityTypes } from "@/state/api";
 import Image from "next/image";
 import { ViewProps } from "@/lib/types";
 import { Popover } from "@mui/material";
+import ModalComments from "@/components/ModalComments";
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
@@ -150,6 +151,7 @@ const Task = ({ task }: TaskProps) => {
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [isModalCommentsOpen, setIsModalCommentsOpen] = useState(false);
 
   const taskTagsSplit = task.tags ? task.tags.split(",") : [];
   const formattedStartDate = task.startDate
@@ -207,125 +209,132 @@ const Task = ({ task }: TaskProps) => {
   };
 
   return (
-    <div
-      ref={(el) => {
-        drag(el);
-      }}
-      className={`mb-4 rounded-md bg-white shadow dark:bg-dark-secondary ${isDragging ? "opacity-50" : "opacity-100"}`}
-    >
-      {task.attachments && task.attachments.length > 0 && (
-        <Image
-          src={`/${task.attachments[0].fileUrl}`}
-          alt={task.attachments[0].fileName}
-          width={400}
-          height={200}
-          className="h-auto w-full rounded-t-md"
-        />
-      )}
-      <div className="p4 md:p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex flex-1 flex-wrap items-center gap-2">
-            {task.priority && <PriorityTag priority={task.priority} />}
-            <div className="flex gap-2">
-              {taskTagsSplit.map((tag) => (
-                <div
-                  key={"task-tag-" + tag}
-                  className="rounded-full bg-blue-100 px-2 py-1 text-xs"
-                >
-                  {" "}
-                  {tag}
-                </div>
-              ))}
+    <>
+      <ModalComments
+        isOpen={isModalCommentsOpen}
+        onClose={() => setIsModalCommentsOpen(false)}
+        task={task}
+      />
+      <div
+        ref={(el) => {
+          drag(el);
+        }}
+        className={`mb-4 rounded-md bg-white shadow dark:bg-dark-secondary ${isDragging ? "opacity-50" : "opacity-100"}`}
+      >
+        {task.attachments && task.attachments.length > 0 && (
+          <Image
+            src={`/${task.attachments[0].fileUrl}`}
+            alt={task.attachments[0].fileName}
+            width={400}
+            height={200}
+            className="h-auto w-full rounded-t-md"
+          />
+        )}
+        <div className="p4 md:p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex flex-1 flex-wrap items-center gap-2">
+              {task.priority && <PriorityTag priority={task.priority} />}
+              <div className="flex gap-2">
+                {taskTagsSplit.map((tag) => (
+                  <div
+                    key={"task-tag-" + tag}
+                    className="rounded-full bg-blue-100 px-2 py-1 text-xs"
+                  >
+                    {" "}
+                    {tag}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <button
-            className="flex h-6 w-4 flex-shrink-0 items-center justify-center dark:text-neutral-500"
-            onClick={handleTaskClick}
-          >
-            <EllipsisVertical size={26} />
-          </button>
-          <Popover
-            id={id}
-            open={open}
-            anchorEl={anchorEl}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
-            }}
-          >
-            <div className="flex flex-col gap-2 border border-stroke-dark p-1 dark:bg-dark-bg dark:text-white">
-              <button
-                className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
-                onClick={handleMarkAsDone}
-              >
-                Mark as done
-              </button>
-              {userDetails?.userId === task.author?.userId && (
+            <button
+              className="flex h-6 w-4 flex-shrink-0 items-center justify-center dark:text-neutral-500"
+              onClick={handleTaskClick}
+            >
+              <EllipsisVertical size={26} />
+            </button>
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+            >
+              <div className="flex flex-col gap-2 border border-stroke-dark p-1 dark:bg-dark-bg dark:text-white">
+                <button
+                  className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
+                  onClick={handleMarkAsDone}
+                >
+                  Mark as done
+                </button>
                 <button
                   className="rounded p-1 text-white transition-colors duration-100 ease-in-out hover:bg-red-500"
                   onClick={handleDeleteTask}
                 >
                   Delete
                 </button>
-              )}
-            </div>
-          </Popover>
-        </div>
+              </div>
+            </Popover>
+          </div>
 
-        <div className="my-3 flex justify-between">
-          <h4 className="text-md font-bold dark:text-white">{task.title}</h4>
-          {typeof task.points === "number" && (
-            <div className="text-xs font-semibold dark:text-white">
-              {task.points} pts
-            </div>
-          )}
-        </div>
-
-        <div className="text-xs text-gray-500 dark:text-neutral-500">
-          {formattedStartDate && <span>{formattedStartDate} - </span>}
-          {formattedDueDate && <span>{formattedDueDate}</span>}
-        </div>
-        <p className="text-sm text-gray-600 dark:text-neutral-500">
-          {task.description}
-        </p>
-        <div className="mt-4 border-t border-gray-200 dark:border-stroke-dark" />
-
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex -space-x-[6px] overflow-hidden">
-            {task.assignee && (
-              <Image
-                key={"task-assignee-image-" + task.assignee.userId}
-                src={`/${task.assignee.profilePictureUrl!}`}
-                alt={task.assignee.username}
-                width={30}
-                height={30}
-                className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
-              />
-            )}
-
-            {task.author && (
-              <Image
-                key={"task-author-image-" + task.author.userId}
-                src={`/${task.author.profilePictureUrl!}`}
-                alt={task.author.username}
-                width={30}
-                height={30}
-                className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
-              />
+          <div className="my-3 flex justify-between">
+            <h4 className="text-md font-bold dark:text-white">{task.title}</h4>
+            {typeof task.points === "number" && (
+              <div className="text-xs font-semibold dark:text-white">
+                {task.points} pts
+              </div>
             )}
           </div>
 
-          <div className="flex items-center text-gray-500 dark:text-neutral-500">
-            <MessageSquareMore size={20} />
-            <span className="ml-1 text-sm dark:text-neutral-400">
-              {commentsCount}
-            </span>
+          <div className="text-xs text-gray-500 dark:text-neutral-500">
+            {formattedStartDate && <span>{formattedStartDate} - </span>}
+            {formattedDueDate && <span>{formattedDueDate}</span>}
+          </div>
+          <p className="text-sm text-gray-600 dark:text-neutral-500">
+            {task.description}
+          </p>
+          <div className="mt-4 border-t border-gray-200 dark:border-stroke-dark" />
+
+          <div className="mt-3 flex items-center justify-between">
+            <div className="flex -space-x-[6px] overflow-hidden">
+              {task.assignee && (
+                <Image
+                  key={"task-assignee-image-" + task.assignee.userId}
+                  src={`/${task.assignee.profilePictureUrl!}`}
+                  alt={task.assignee.username}
+                  width={30}
+                  height={30}
+                  className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
+                />
+              )}
+
+              {task.author && (
+                <Image
+                  key={"task-author-image-" + task.author.userId}
+                  src={`/${task.author.profilePictureUrl!}`}
+                  alt={task.author.username}
+                  width={30}
+                  height={30}
+                  className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
+                />
+              )}
+            </div>
+
+            <button
+              className={`flex items-center text-gray-500 dark:text-neutral-500 ${commentsCount > 0 ? "transition-[transform, color] duration-200 ease-in-out hover:scale-125 hover:text-blue-500 dark:hover:text-white" : ""}`}
+              disabled={commentsCount === 0}
+              onClick={() => setIsModalCommentsOpen(true)}
+            >
+              <MessageSquareMore size={20} />
+              <span className="ml-1 text-sm">{commentsCount}</span>
+            </button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

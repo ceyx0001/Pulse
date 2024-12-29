@@ -15,7 +15,7 @@ const columns: GridColDef[] = [
     width: 130,
     renderCell: (params) => (
       <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
-        {params.value || 'No Status'}
+        {params.value || "No Status"}
       </span>
     ),
   },
@@ -27,13 +27,19 @@ const columns: GridColDef[] = [
     field: "author",
     headerName: "Author",
     width: 150,
-    renderCell: (params) => params.value?.author || "Unknown",
+    renderCell: (params) => params.value?.username || "Unknown",
   },
   {
-    field: "asignee",
-    headerName: "Asignee",
+    field: "assignee",
+    headerName: "Assignee",
     width: 150,
-    renderCell: (params) => params.value?.assignee || "Unassigned",
+    renderCell: (params) => params.value?.username || "Unassigned",
+  },
+  {
+    field: "progress",
+    headerName: "Progress",
+    width: 75,
+    renderCell: (params) => (params.value?.points / 10) * 100 || 0,
   },
 ];
 
@@ -46,7 +52,8 @@ const Table = ({ id, setIsModalOpen }: ViewProps) => {
   } = useGetTasksQuery({ projectId: Number(id) });
 
   if (isLoading) return <span className="text-gray-500">Loading...</span>;
-  if (error) return <span className="text-red-500">Error while fetching tasks.</span>;
+  if (error)
+    return <span className="text-red-500">Error while fetching tasks.</span>;
 
   return (
     <div className="h-[540px] w-full px-4 pb-8 xl:px-6">

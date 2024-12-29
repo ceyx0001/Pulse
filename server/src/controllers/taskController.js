@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTask = exports.getUserTasks = exports.updateTaskStatus = exports.postTask = exports.getTasks = void 0;
+exports.deleteTask = exports.getUserTasks = exports.updateTaskPoints = exports.updateTaskComments = exports.updateTaskStatus = exports.postTask = exports.getTasks = void 0;
 const client_1 = require("@prisma/client");
 const utils_1 = require("../lib/utils");
 const prisma = new client_1.PrismaClient();
@@ -84,6 +84,48 @@ const updateTaskStatus = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.updateTaskStatus = updateTaskStatus;
+const updateTaskComments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { comments } = req.body;
+        const { taskId } = req.params;
+        const updatedTask = yield prisma.task.update({
+            where: {
+                id: Number(taskId),
+            },
+            data: {
+                comments: comments,
+            },
+        });
+        res.status(200).json(updatedTask);
+    }
+    catch (error) {
+        res
+            .status(500)
+            .json({ error: (0, utils_1.parsePrismaError)(error, "Error updating task comments.") });
+    }
+});
+exports.updateTaskComments = updateTaskComments;
+const updateTaskPoints = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { points } = req.body;
+        const { taskId } = req.params;
+        const updatedTask = yield prisma.task.update({
+            where: {
+                id: Number(taskId),
+            },
+            data: {
+                points: points,
+            },
+        });
+        res.status(200).json(updatedTask);
+    }
+    catch (error) {
+        res
+            .status(500)
+            .json({ error: (0, utils_1.parsePrismaError)(error, "Error updating task points.") });
+    }
+});
+exports.updateTaskPoints = updateTaskPoints;
 const getUserTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.params;
@@ -110,11 +152,10 @@ const getUserTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.getUserTasks = getUserTasks;
 const deleteTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { taskId, userId } = req.params;
+        const { taskId, _userId } = req.params;
         yield prisma.task.delete({
             where: {
                 id: Number(taskId),
-                authorUserId: Number(userId),
             },
         });
         res.status(204).send();
