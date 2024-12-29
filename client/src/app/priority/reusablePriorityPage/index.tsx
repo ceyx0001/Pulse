@@ -77,7 +77,7 @@ const ReusablePriorityPage = ({ priority }: Props) => {
   const [view, setView] = useState("list");
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
-  const { data: currentUser } = useGetAuthUserQuery({});
+  const { data: currentUser } = useGetAuthUserQuery();
   const userId = currentUser?.userDetails?.userId ?? null;
   const {
     data: tasks,
@@ -124,7 +124,7 @@ const ReusablePriorityPage = ({ priority }: Props) => {
         <button
           className={`px-4 py-2 ${
             view === "table" ? "bg-gray-300" : "bg-white"
-          } rounded-l`}
+          } rounded-r`}
           onClick={() => setView("table")}
         >
           Table
@@ -135,7 +135,7 @@ const ReusablePriorityPage = ({ priority }: Props) => {
       ) : view === "list" ? (
         <div className="grid grid-cols-1 gap-4">
           {filteredTasks?.map((task: Task) => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard key={"task-card-priority-" + task.id} task={task} />
           ))}
         </div>
       ) : (

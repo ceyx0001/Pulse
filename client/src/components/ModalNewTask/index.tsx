@@ -1,6 +1,6 @@
 import Modal from "@/components/Modal";
 import { Priority, Status, useCreateTaskMutation } from "@/state/api";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { formatISO } from "date-fns";
 
 type Props = {
@@ -15,13 +15,16 @@ const ModalNewTask = ({ isOpen, onClose, id = null, defaultStatus }: Props) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<Status | undefined>(defaultStatus);
-  const [priority, setPriority] = useState<Priority>(Priority.Backlog);
+  const [priority, setPriority] = useState<Priority>();
   const [tags, setTags] = useState("");
   const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [authorUserId, setAuthorUserId] = useState("");
   const [assignedUserId, setAssignedUserId] = useState("");
   const [projectId, setProjectId] = useState("");
+  useEffect(() => {
+    setStatus(defaultStatus);
+  }, [defaultStatus]);
 
   const handleSubmit = async () => {
     if (!title || !authorUserId || !(id !== null || projectId)) return;
@@ -32,11 +35,10 @@ const ModalNewTask = ({ isOpen, onClose, id = null, defaultStatus }: Props) => {
     const formattedDueDate = formatISO(new Date(dueDate), {
       representation: "complete",
     });
-
     await createTask({
       title,
       description,
-      status,
+      status: status,
       priority,
       tags,
       startDate: formattedStartDate,
@@ -45,10 +47,26 @@ const ModalNewTask = ({ isOpen, onClose, id = null, defaultStatus }: Props) => {
       assignedUserId: parseInt(assignedUserId),
       projectId: id !== null ? Number(id) : Number(projectId),
     });
+    
+    onClose();
+    setTitle("");
+    setDescription("");
+    setPriority(undefined);
+    setTags("");
+    setStartDate("");
+    setDueDate("");
+    setAuthorUserId("");
+    setAssignedUserId("");
   };
 
   const isFormValid = () => {
-    return title && authorUserId && (id !== null || projectId);
+    return (
+      title &&
+      authorUserId &&
+      (id !== null || projectId) &&
+      Object.values(Status).includes(status as Status) &&
+      Object.values(Priority).includes(priority as Priority)
+    );
   };
 
   const selectStyles =
@@ -82,10 +100,14 @@ const ModalNewTask = ({ isOpen, onClose, id = null, defaultStatus }: Props) => {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
           <select
             className={selectStyles}
-            value={defaultStatus || status}
-            onChange={(e) =>
-              setStatus(Status[e.target.value as keyof typeof Status])
-            }
+            value={status}
+            onChange={(e) => {
+              const status =
+                Status[
+                  e.target.value.replace(/\s+/g, "") as keyof typeof Status
+                ];
+              setStatus(status);
+            }}
           >
             <option value="">Select Status</option>
             <option value={Status.ToDo}>To Do</option>
@@ -97,7 +119,11 @@ const ModalNewTask = ({ isOpen, onClose, id = null, defaultStatus }: Props) => {
             className={selectStyles}
             value={priority}
             onChange={(e) =>
-              setPriority(Priority[e.target.value as keyof typeof Priority])
+              setPriority(
+                Priority[
+                  e.target.value.replace(/\s+/g, "") as keyof typeof Priority
+                ],
+              )
             }
           >
             <option value="">Select Priority</option>

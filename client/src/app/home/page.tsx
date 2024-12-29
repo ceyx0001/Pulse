@@ -129,7 +129,7 @@ const HomePage = () => {
               <Pie dataKey="count" data={projectStatus} fill="#82ca9d" label>
                 {projectStatus.map((entry, index) => (
                   <Cell
-                    key={`cell-${index}`}
+                    key={`table-cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
                   />
                 ))}

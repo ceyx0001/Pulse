@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   Status,
   useDeleteTaskMutation,
+  useGetAuthUserQuery,
   useGetTasksQuery,
   useUpdateTaskStatusMutation,
 } from "@/state/api";
@@ -42,7 +43,7 @@ const Board = ({
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
         {taskStatus.map((status) => (
           <TaskColumn
-            key={status}
+            key={"task-column-" + status}
             status={status}
             tasks={tasks || []}
             moveTask={moveTask}
@@ -129,7 +130,7 @@ const TaskColumn = ({
       {tasks
         .filter((task) => task.status === status)
         .map((task) => (
-          <Task key={task.id} task={task} />
+          <Task key={"task-component-" + task.id} task={task} />
         ))}
     </div>
   );
@@ -145,6 +146,7 @@ const Task = ({ task }: TaskProps) => {
     item: { id: task.id },
     collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
   }));
+  const { data: currentUser } = useGetAuthUserQuery();
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -176,6 +178,7 @@ const Task = ({ task }: TaskProps) => {
   );
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
+  const userDetails = currentUser?.userDetails;
 
   const handleTaskClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -189,10 +192,18 @@ const Task = ({ task }: TaskProps) => {
     updateTaskStatus({ taskId: task.id, status: "Completed" });
     setAnchorEl(null);
   };
-
   const handleDeleteTask = () => {
-    deleteTask(task.id);
-    setAnchorEl(null);
+    if (!userDetails?.userId) return;
+    deleteTask({ taskId: task.id, userId: userDetails.userId })
+      .unwrap()
+      .then(() => {
+        setAnchorEl(null);
+      })
+      .catch((err) => {
+        if (err.status === 404) {
+        } else {
+        }
+      });
   };
 
   return (
@@ -218,7 +229,7 @@ const Task = ({ task }: TaskProps) => {
             <div className="flex gap-2">
               {taskTagsSplit.map((tag) => (
                 <div
-                  key={tag}
+                  key={"task-tag-" + tag}
                   className="rounded-full bg-blue-100 px-2 py-1 text-xs"
                 >
                   {" "}
@@ -245,18 +256,22 @@ const Task = ({ task }: TaskProps) => {
             }}
           >
             <div className="flex flex-col gap-2 border border-stroke-dark p-1 dark:bg-dark-bg dark:text-white">
-              <button
-                className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
-                onClick={handleMarkAsDone}
-              >
-                Mark as done
-              </button>
-              <button
-                className="rounded p-1 text-white transition-colors duration-100 ease-in-out hover:bg-red-500"
-                onClick={handleDeleteTask}
-              >
-                Delete
-              </button>
+              {userDetails?.userId === task.assignee?.userId && (
+                <button
+                  className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
+                  onClick={handleMarkAsDone}
+                >
+                  Mark as done
+                </button>
+              )}
+              {userDetails?.userId === task.author?.userId && (
+                <button
+                  className="rounded p-1 text-white transition-colors duration-100 ease-in-out hover:bg-red-500"
+                  onClick={handleDeleteTask}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           </Popover>
         </div>
@@ -283,7 +298,7 @@ const Task = ({ task }: TaskProps) => {
           <div className="flex -space-x-[6px] overflow-hidden">
             {task.assignee && (
               <Image
-                key={task.assignee.userId}
+                key={"task-assignee-image-" + task.assignee.userId}
                 src={`/${task.assignee.profilePictureUrl!}`}
                 alt={task.assignee.username}
                 width={30}
@@ -294,7 +309,7 @@ const Task = ({ task }: TaskProps) => {
 
             {task.author && (
               <Image
-                key={task.author.userId}
+                key={"task-author-image-" + task.author.userId}
                 src={`/${task.author.profilePictureUrl!}`}
                 alt={task.author.username}
                 width={30}

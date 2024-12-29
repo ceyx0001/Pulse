@@ -23,7 +23,6 @@ const Navbar = () => {
   };
   if (!currentUser) return null;
   const currentUserDetails = currentUser.userDetails;
-
   return (
     <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black">
       <div className="flex items-center gap-8">
@@ -89,7 +88,7 @@ const Navbar = () => {
             )}
           </div>
           <span className="mx-3 text-gray-800 dark:text-white">
-            {currentUserDetails?.username}
+            {currentUser.user.username}
           </span>
           <button
             className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"

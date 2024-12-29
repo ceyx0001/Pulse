@@ -117,25 +117,10 @@ export const deleteTask = async (req: Request, res: Response): Promise<void> => 
   try {
     const { taskId, userId } = req.params;
 
-    const task = await prisma.task.findUnique({
-      where: {
-        id: Number(taskId),
-      },
-    });
-
-    if (!task) {
-      res.status(404).json({ error: "Task not found" });
-      return;
-    }
-
-    if (task.authorUserId !== Number(userId)) {
-      res.status(403).json({ error: "Not authorized to delete this task" });
-      return;
-    }
-
     await prisma.task.delete({
       where: {
         id: Number(taskId),
+        authorUserId: Number(userId),
       },
     });
     

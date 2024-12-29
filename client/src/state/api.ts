@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+import { AuthUser, fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
 
 export type Project = {
   id: number;
@@ -73,6 +73,12 @@ export type Team = {
   projectManagerUserId?: number;
 };
 
+export type AuthUserResponse = {
+  user: AuthUser;
+  userSub: string;
+  userDetails: User;
+};
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -88,21 +94,26 @@ export const api = createApi({
   reducerPath: "api",
   tagTypes: ["Projects", "Tasks", "Users", "Teams"],
   endpoints: (build) => ({
-    getAuthUser: build.query({
+    getAuthUser: build.query<AuthUserResponse, void>({
       queryFn: async (_args, _api, _extraOptions, fetchWithBQ) => {
         try {
           const user = await getCurrentUser();
           const session = await fetchAuthSession();
           if (!session) throw new Error("No session found");
+          if (!user) throw new Error("No user found");
 
           const { userSub } = session;
-          const userDetailsResponse = await fetchWithBQ(`users/${userSub}`);
+          if (!userSub) throw new Error("No user sub found");
+          const userDetailsResponse = await fetchWithBQ({
+            url: `users/${userSub}`,
+            method: "GET",
+          });
           const userDetails = userDetailsResponse.data as User;
 
           return { data: { user, userSub, userDetails } };
         } catch (error) {
           return {
-            error: { status: 500, data: (error as Error).message },
+            error: { status: 500, statusText: 'Internal Server Error', data: (error as Error).message },
           };
         }
       },
@@ -141,9 +152,9 @@ export const api = createApi({
       }),
       invalidatesTags: ["Tasks"],
     }),
-    deleteTask: build.mutation<Task, number>({
-      query: (taskId) => ({
-        url: `tasks/${taskId}`,
+    deleteTask: build.mutation<Task, { taskId: number; userId: number }>({
+      query: ({ taskId, userId }) => ({
+        url: `tasks/${taskId}/user/${userId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Tasks"],
