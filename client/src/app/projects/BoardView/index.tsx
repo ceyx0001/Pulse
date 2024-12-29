@@ -256,14 +256,12 @@ const Task = ({ task }: TaskProps) => {
             }}
           >
             <div className="flex flex-col gap-2 border border-stroke-dark p-1 dark:bg-dark-bg dark:text-white">
-              {userDetails?.userId === task.assignee?.userId && (
-                <button
-                  className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
-                  onClick={handleMarkAsDone}
-                >
-                  Mark as done
-                </button>
-              )}
+              <button
+                className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
+                onClick={handleMarkAsDone}
+              >
+                Mark as done
+              </button>
               {userDetails?.userId === task.author?.userId && (
                 <button
                   className="rounded p-1 text-white transition-colors duration-100 ease-in-out hover:bg-red-500"

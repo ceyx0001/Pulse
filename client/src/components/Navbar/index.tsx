@@ -13,7 +13,7 @@ const Navbar = () => {
     isDarkMode: state.global.isDarkMode,
   }));
 
-  const { data: currentUser } = useGetAuthUserQuery({});
+  const { data: currentUser } = useGetAuthUserQuery();
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -24,7 +24,7 @@ const Navbar = () => {
   if (!currentUser) return null;
   const currentUserDetails = currentUser.userDetails;
   return (
-    <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black">
+    <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black sticky top-0 z-50">
       <div className="flex items-center gap-8">
         {!isSidebarCollapsed ? null : (
           <button
