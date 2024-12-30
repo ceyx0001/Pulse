@@ -99,11 +99,13 @@ model Attachment {
 }
 
 model Comment {
-  id     Int    @id @default(autoincrement())
+  id     Int    
   text   String
   taskId Int
   userId Int
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [userId])
+
+  @@id([id, taskId])
 }

@@ -99,7 +99,7 @@ export const api = createApi({
     },
   }),
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Users", "Teams"],
+  tagTypes: ["Projects", "Tasks", "Users", "Teams", "Comments"],
   endpoints: (build) => ({
     getAuthUser: build.query<AuthUserResponse, void>({
       queryFn: async (_args, _api, _extraOptions, fetchWithBQ) => {
@@ -120,7 +120,11 @@ export const api = createApi({
           return { data: { user, userSub, userDetails } };
         } catch (error) {
           return {
-            error: { status: 500, statusText: 'Internal Server Error', data: (error as Error).message },
+            error: {
+              status: 500,
+              statusText: "Internal Server Error",
+              data: (error as Error).message,
+            },
           };
         }
       },
@@ -197,6 +201,21 @@ export const api = createApi({
     search: build.query<SearchResults, string>({
       query: (query) => `search?query=${query}`,
     }),
+    deleteComment: build.mutation<Comment, number>({
+      query: (commentId) => ({
+        url: `comments/${commentId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Comments"],
+    }),
+    createComment: build.mutation<Comment, Comment>({
+      query: (comment) => ({
+        url: `comments/${comment.id}`,
+        method: "POST",
+        body: comment,
+      }),
+      invalidatesTags: ["Comments"],
+    }),
   }),
 });
 
@@ -213,4 +232,6 @@ export const {
   useGetTeamsQuery,
   useGetTasksByUserQuery,
   useGetAuthUserQuery,
+  useCreateCommentMutation,
+  useDeleteCommentMutation,
 } = api;

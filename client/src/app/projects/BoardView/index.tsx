@@ -77,7 +77,18 @@ const TaskColumn = ({
     drop: (item: { id: number }) => moveTask(item.id, status),
     collect: (monitor) => ({ isOver: !!monitor.isOver() }),
   }));
-  const tasksCount = tasks.filter((task) => task.status === status).length;
+  const { tasksCount, totalCommentsCount } = tasks.reduce(
+    (acc, task) => {
+      if (task.status === status) {
+        return {
+          tasksCount: acc.tasksCount + 1,
+          totalCommentsCount: acc.totalCommentsCount + (task.comments?.length || 0),
+        };
+      }
+      return acc;
+    },
+    { tasksCount: 0, totalCommentsCount: 0 },
+  );
   const statusColor = {
     "To Do": "#2563EB",
     "Work In Progress": "#059669",
@@ -131,7 +142,7 @@ const TaskColumn = ({
       {tasks
         .filter((task) => task.status === status)
         .map((task) => (
-          <Task key={"task-component-" + task.id} task={task} />
+          <Task key={"task-component-" + task.id} task={task} totalCommentsCount={totalCommentsCount}/>
         ))}
     </div>
   );
@@ -139,9 +150,10 @@ const TaskColumn = ({
 
 type TaskProps = {
   task: TaskType;
+  totalCommentsCount: number;
 };
 
-const Task = ({ task }: TaskProps) => {
+const Task = ({ task, totalCommentsCount }: TaskProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "task",
     item: { id: task.id },
@@ -160,7 +172,6 @@ const Task = ({ task }: TaskProps) => {
   const formattedDueDate = task.dueDate
     ? format(new Date(task.dueDate), "P")
     : "";
-  const commentsCount = (task.comments && task.comments.length) || 0;
   const PriorityTag = ({ priority }: { priority: TaskType["priority"] }) => (
     <div
       className={`rounded-full px-2 py-1 text-xs font-semibold ${
@@ -181,6 +192,7 @@ const Task = ({ task }: TaskProps) => {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
   const userDetails = currentUser?.userDetails;
+  const commentsCount = task.comments?.length || 0;
 
   const handleTaskClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -214,6 +226,7 @@ const Task = ({ task }: TaskProps) => {
         isOpen={isModalCommentsOpen}
         onClose={() => setIsModalCommentsOpen(false)}
         task={task}
+        commentsCount={totalCommentsCount}
       />
       <div
         ref={(el) => {

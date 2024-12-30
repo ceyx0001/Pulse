@@ -1,16 +1,17 @@
 import Modal from "@/components/Modal";
-import { Task, useGetAuthUserQuery, useUpdateTaskCommentsMutation } from "@/state/api";
-import { useState, useCallback, useMemo } from "react";
+import { Task, useCreateCommentMutation, useGetAuthUserQuery,  } from "@/state/api";
+import { useState } from "react";
 import { Comment as CommentType } from "@/state/api";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   task: Task;
+  commentsCount: number;
 };
 
-const ModalComments = ({ isOpen, onClose, task }: Props) => {
-  const [updateTaskComments, { isLoading }] = useUpdateTaskCommentsMutation();
+const ModalComments = ({ isOpen, onClose, task, commentsCount }: Props) => {
+  const [createComment] = useCreateCommentMutation();
   const { data: user } = useGetAuthUserQuery();
   const [comments, setComments] = useState(task.comments || []);
   const [commentText, setCommentText] = useState("");
@@ -22,15 +23,12 @@ const ModalComments = ({ isOpen, onClose, task }: Props) => {
   const handleSubmit = () => {
     if (!user?.userDetails.userId) return;
     const newComment: CommentType = {
-      id: undefined,
+      id: commentsCount + 1,
       text: commentText,
       taskId: task.id,
       userId: user?.userDetails.userId,
     };
-    updateTaskComments({
-      taskId: task.id,
-      comments: [...comments, newComment],
-    });
+    createComment(newComment);
   };
 
   return (
