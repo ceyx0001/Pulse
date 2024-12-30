@@ -87,29 +87,6 @@ export const updateTaskStatus = async (
   }
 };
 
-export const updateTaskComments = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const { comments } = req.body;
-    const { taskId } = req.params;
-    const updatedTask = await prisma.task.update({
-      where: {
-        id: Number(taskId),
-      },
-      data: {
-        comments: comments,
-      },
-    });
-    res.status(200).json(updatedTask);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ error: parsePrismaError(error, "Error updating task comments.") });
-  }
-};
-
 export const updateTaskPoints = async (
   req: Request,
   res: Response

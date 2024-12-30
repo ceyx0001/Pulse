@@ -79,6 +79,13 @@ export type AuthUserResponse = {
   userDetails: User;
 };
 
+export type Comment = {
+  id: number;
+  text: string;
+  taskId: number;
+  userId: number;
+};
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -169,6 +176,16 @@ export const api = createApi({
         { type: "Tasks", id: taskId },
       ],
     }),
+    updateTaskPoints: build.mutation<Task, { taskId: number; points: number }>({
+      query: ({ taskId, points }) => ({
+        url: `tasks/${taskId}/points`,
+        method: "PATCH",
+        body: { points },
+      }),
+      invalidatesTags: (result, error, { taskId }) => [
+        { type: "Tasks", id: taskId },
+      ],
+    }),
     getUsers: build.query<User[], void>({
       query: () => "users",
       providesTags: ["Users"],
@@ -190,6 +207,7 @@ export const {
   useCreateTaskMutation,
   useDeleteTaskMutation,
   useUpdateTaskStatusMutation,
+  useUpdateTaskPointsMutation,
   useSearchQuery,
   useGetUsersQuery,
   useGetTeamsQuery,
