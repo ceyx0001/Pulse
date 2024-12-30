@@ -26,11 +26,14 @@ export const postComment = async (req: Request, res: Response): Promise<void> =>
 
 export const deleteComment = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { commentId } = req.params;
+    const { commentId, taskId } = req.params;
 
     await prisma.comment.delete({
       where: {
-        id: Number(commentId),
+        id_taskId: {
+          id: Number(commentId),
+          taskId: Number(taskId)
+        },
       },
     });
     

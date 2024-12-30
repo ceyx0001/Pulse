@@ -35,10 +35,13 @@ const postComment = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.postComment = postComment;
 const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { commentId } = req.params;
+        const { commentId, taskId } = req.params;
         yield prisma.comment.delete({
             where: {
-                id: Number(commentId),
+                id_taskId: {
+                    id: Number(commentId),
+                    taskId: Number(taskId)
+                },
             },
         });
         res.status(204).send();

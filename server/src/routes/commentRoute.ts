@@ -6,7 +6,7 @@ import {
 
 const router = Router();
 
-router.post("/commentId", postComment);
-router.delete("/:commentId", deleteComment);
+router.post("/:commentId", postComment);
+router.delete("/:commentId/task/:taskId/", deleteComment);
 
 export default router;
