@@ -201,9 +201,9 @@ export const api = createApi({
     search: build.query<SearchResults, string>({
       query: (query) => `search?query=${query}`,
     }),
-    deleteComment: build.mutation<Comment, number>({
-      query: (commentId) => ({
-        url: `comments/${commentId}`,
+    deleteComment: build.mutation<Comment, { commentId: number; taskId: number }>({
+      query: ({ commentId, taskId }) => ({
+        url: `comments/${commentId}/task/${taskId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Comments"],

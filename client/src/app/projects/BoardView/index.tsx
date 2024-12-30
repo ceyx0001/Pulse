@@ -77,7 +77,7 @@ const TaskColumn = ({
     drop: (item: { id: number }) => moveTask(item.id, status),
     collect: (monitor) => ({ isOver: !!monitor.isOver() }),
   }));
-  const { tasksCount, totalCommentsCount } = tasks.reduce(
+  const [columnStats, setColumnStats] = useState(tasks.reduce(
     (acc, task) => {
       if (task.status === status) {
         return {
@@ -88,7 +88,7 @@ const TaskColumn = ({
       return acc;
     },
     { tasksCount: 0, totalCommentsCount: 0 },
-  );
+  ));
   const statusColor = {
     "To Do": "#2563EB",
     "Work In Progress": "#059669",
@@ -117,7 +117,7 @@ const TaskColumn = ({
               className="ml-2 inline-block rounded-full bg-gray-200 p-1 text-center text-sm leading-none dark:bg-dark-tertiary"
               style={{ width: "1.5rem", height: "1.5rem" }}
             >
-              {tasksCount}
+              {columnStats.tasksCount}
             </span>
           </h3>
           <div className="flex items-center gap-1">
@@ -142,7 +142,7 @@ const TaskColumn = ({
       {tasks
         .filter((task) => task.status === status)
         .map((task) => (
-          <Task key={"task-component-" + task.id} task={task} totalCommentsCount={totalCommentsCount}/>
+          <Task key={"task-component-" + task.id} task={task} columnStats={columnStats} setColumnStats={setColumnStats}/>
         ))}
     </div>
   );
@@ -150,10 +150,11 @@ const TaskColumn = ({
 
 type TaskProps = {
   task: TaskType;
-  totalCommentsCount: number;
+  columnStats: { tasksCount: number; totalCommentsCount: number };
+  setColumnStats: (columnStats: { tasksCount: number; totalCommentsCount: number }) => void;
 };
 
-const Task = ({ task, totalCommentsCount }: TaskProps) => {
+const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "task",
     item: { id: task.id },
@@ -192,7 +193,6 @@ const Task = ({ task, totalCommentsCount }: TaskProps) => {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
   const userDetails = currentUser?.userDetails;
-  const commentsCount = task.comments?.length || 0;
 
   const handleTaskClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -220,13 +220,18 @@ const Task = ({ task, totalCommentsCount }: TaskProps) => {
       });
   };
 
+  const commentsCount = task.comments?.length || 0;
+
   return (
     <>
       <ModalComments
         isOpen={isModalCommentsOpen}
         onClose={() => setIsModalCommentsOpen(false)}
         task={task}
-        commentsCount={totalCommentsCount}
+        comments={task.comments || []}
+        commentCount={commentsCount}
+        columnStats={columnStats}
+        setColumnStats={setColumnStats}
       />
       <div
         ref={(el) => {
