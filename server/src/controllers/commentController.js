@@ -20,8 +20,8 @@ const postComment = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             data: {
                 id: commentId,
                 text: comment,
-                taskId: taskId,
-                userId: userId,
+                taskId: Number(taskId),
+                userId: Number(userId),
             },
         });
         res.status(201).json(newComment);

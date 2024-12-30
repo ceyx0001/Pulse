@@ -7,13 +7,12 @@ const prisma = new PrismaClient();
 export const postComment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { comment, commentId, taskId, userId } = req.body;
-
     const newComment = await prisma.comment.create({
       data: {
         id: commentId,
         text: comment,
-        taskId: taskId,
-        userId: userId,
+        taskId: Number(taskId),
+        userId: Number(userId),
       },
     });
     res.status(201).json(newComment);

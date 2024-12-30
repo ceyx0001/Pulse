@@ -210,7 +210,7 @@ export const api = createApi({
     }),
     createComment: build.mutation<Comment, Comment>({
       query: (comment) => ({
-        url: `comments/${comment.id}`,
+        url: `comments`,
         method: "POST",
         body: comment,
       }),
