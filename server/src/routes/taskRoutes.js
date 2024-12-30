@@ -7,7 +7,6 @@ router.get("/", taskController_1.getTasks);
 router.get("/user/:userId", taskController_1.getUserTasks);
 router.post("/", taskController_1.postTask);
 router.patch("/:taskId/status", taskController_1.updateTaskStatus);
-router.patch("/:taskId/comments", taskController_1.updateTaskComments);
 router.patch("/:taskId/points", taskController_1.updateTaskPoints);
 router.delete("/:taskId/user/:userId", taskController_1.deleteTask);
 exports.default = router;
