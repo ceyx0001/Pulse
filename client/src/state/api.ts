@@ -212,7 +212,12 @@ export const api = createApi({
       query: (comment) => ({
         url: `comments`,
         method: "POST",
-        body: comment,
+        body: {
+          id: comment.id,
+          text: comment.text,
+          taskId: comment.taskId,
+          userId: comment.userId,
+        },
       }),
       invalidatesTags: ["Comments"],
     }),

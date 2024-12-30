@@ -15,11 +15,11 @@ const utils_1 = require("../lib/utils");
 const prisma = new client_1.PrismaClient();
 const postComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { comment, commentId, taskId, userId } = req.body;
+        const { id, text, taskId, userId } = req.body;
         const newComment = yield prisma.comment.create({
             data: {
-                id: commentId,
-                text: comment,
+                id: id,
+                text: text,
                 taskId: Number(taskId),
                 userId: Number(userId),
             },
