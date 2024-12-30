@@ -342,8 +342,7 @@ const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
             </div>
 
             <button
-              className={`flex items-center text-gray-500 dark:text-neutral-500 ${commentsCount > 0 ? "transition-[transform, color] duration-200 ease-in-out hover:scale-125 hover:text-blue-500 dark:hover:text-white" : ""}`}
-              disabled={commentsCount === 0}
+              className={`flex items-center text-gray-500 dark:text-neutral-500 transition-[transform, color] duration-200 ease-in-out hover:scale-125 hover:text-blue-500 dark:hover:text-white`}
               onClick={() => setIsModalCommentsOpen(true)}
             >
               <MessageSquareMore size={20} />

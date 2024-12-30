@@ -53,6 +53,7 @@ const ModalComments = ({
       ...columnStats,
       totalCommentsCount: columnStats.totalCommentsCount + 1,
     });
+    setCommentText("");
   };
 
   const handleDelete = (commentId: number, taskId: number) => {

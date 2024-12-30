@@ -12,7 +12,9 @@ export const getProjects = async (
     const projects = await prisma.project.findMany();
     res.status(200).json(projects);
   } catch (error: any) {
-    res.status(500).json({ error: parsePrismaError(error, "Error getting projects.") });
+    res
+      .status(500)
+      .json({ error: parsePrismaError(error, "Error getting projects.") });
   }
 };
 
@@ -32,6 +34,23 @@ export const postProject = async (
     });
     res.status(201).json(newProject);
   } catch (error: any) {
-    res.status(500).json({ error: parsePrismaError(error, "Error creating project.") });
+    res
+      .status(500)
+      .json({ error: parsePrismaError(error, "Error creating project.") });
+  }
+};
+
+export const deleteProject = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    await prisma.project.delete({ where: { id: Number(id) } });
+    res.status(204).send();
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ error: parsePrismaError(error, "Error deleting project.") });
   }
 };

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postProject = exports.getProjects = void 0;
+exports.deleteProject = exports.postProject = exports.getProjects = void 0;
 const client_1 = require("@prisma/client");
 const utils_1 = require("../lib/utils");
 const prisma = new client_1.PrismaClient();
@@ -19,7 +19,9 @@ const getProjects = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(200).json(projects);
     }
     catch (error) {
-        res.status(500).json({ error: (0, utils_1.parsePrismaError)(error, "Error getting projects.") });
+        res
+            .status(500)
+            .json({ error: (0, utils_1.parsePrismaError)(error, "Error getting projects.") });
     }
 });
 exports.getProjects = getProjects;
@@ -37,7 +39,22 @@ const postProject = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(201).json(newProject);
     }
     catch (error) {
-        res.status(500).json({ error: (0, utils_1.parsePrismaError)(error, "Error creating project.") });
+        res
+            .status(500)
+            .json({ error: (0, utils_1.parsePrismaError)(error, "Error creating project.") });
     }
 });
 exports.postProject = postProject;
+const deleteProject = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        yield prisma.project.delete({ where: { id: Number(id) } });
+        res.status(204).send();
+    }
+    catch (error) {
+        res
+            .status(500)
+            .json({ error: (0, utils_1.parsePrismaError)(error, "Error deleting project.") });
+    }
+});
+exports.deleteProject = deleteProject;
