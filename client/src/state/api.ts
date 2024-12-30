@@ -201,12 +201,18 @@ export const api = createApi({
     search: build.query<SearchResults, string>({
       query: (query) => `search?query=${query}`,
     }),
-    deleteComment: build.mutation<Comment, { commentId: number; taskId: number }>({
+    deleteComment: build.mutation<
+      Comment,
+      { commentId: number; taskId: number }
+    >({
       query: ({ commentId, taskId }) => ({
         url: `comments/${commentId}/task/${taskId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Comments"],
+      invalidatesTags: (result, error, args) => [
+        { type: "Tasks", id: args.taskId },
+        { type: "Comments" },
+      ],
     }),
     createComment: build.mutation<Comment, Comment>({
       query: (comment) => ({
@@ -219,7 +225,10 @@ export const api = createApi({
           userId: comment.userId,
         },
       }),
-      invalidatesTags: ["Comments"],
+      invalidatesTags: (result, error, args) => [
+        { type: "Tasks", id: args.taskId },
+        { type: "Comments" },
+      ],
     }),
   }),
 });

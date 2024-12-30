@@ -33,19 +33,6 @@ export const deleteComment = async (
   try {
     const { commentId, taskId } = req.params;
 
-    const comment = await prisma.comment.findUnique({
-      where: {
-        id_taskId: {
-          id: Number(commentId),
-          taskId: Number(taskId),
-        },
-      },
-    });
-
-    if (!comment) {
-      throw new Error(`Comment not found: id=${commentId}, taskId=${taskId}`);
-    }
-
     await prisma.comment.delete({
       where: {
         id_taskId: {

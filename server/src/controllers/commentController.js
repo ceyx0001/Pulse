@@ -36,17 +36,6 @@ exports.postComment = postComment;
 const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { commentId, taskId } = req.params;
-        const comment = yield prisma.comment.findUnique({
-            where: {
-                id_taskId: {
-                    id: Number(commentId),
-                    taskId: Number(taskId),
-                },
-            },
-        });
-        if (!comment) {
-            throw new Error(`Comment not found: id=${commentId}, taskId=${taskId}`);
-        }
         yield prisma.comment.delete({
             where: {
                 id_taskId: {
