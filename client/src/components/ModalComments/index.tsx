@@ -67,14 +67,14 @@ const ModalComments = ({
           <div key={"task-" + task.id + "-comment-" + i} className="flex items-center justify-between">
             <p className="text-black dark:text-white">{comment.text}</p>
             <button className="scale-125" onClick={() => handleDelete(comment.id, task.id)}>
-              <X className="h-4 w-4 text-white dark:text-white bg-red-700" />
+              <X className="h-4 w-4 text-white dark:text-white bg-red-700 hover:bg-red-800" />
             </button>
           </div>
         ))}
       </div>
       <div className="flex flex-col gap-5 px-5 pb-2 pt-6">
         <textarea
-          className="w-full rounded-md border border-gray-300 p-2 dark:bg-dark-bg dark:text-white"
+          className="w-full rounded-md border border-gray-300 p-2 dark:bg-dark-bg dark:text-white outline-none"
           placeholder="Write your comment here..."
           value={commentText}
           onChange={handleChange}

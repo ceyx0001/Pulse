@@ -2,13 +2,13 @@ import React from "react";
 
 type HeaderProps = {
   name: string;
-  buttonComponent?: React.ReactNode;
+  children?: React.ReactNode;
   isSmallText?: boolean;
 };
 
 const Header = ({
   name,
-  buttonComponent,
+  children,
   isSmallText = false,
 }: HeaderProps) => {
   return (
@@ -18,7 +18,7 @@ const Header = ({
       >
         {name}
       </h1>
-      {buttonComponent}
+      {children}
     </div>
   );
 };

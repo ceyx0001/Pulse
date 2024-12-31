@@ -20,7 +20,6 @@ const Timeline = ({ id, setIsModalOpen }: ViewProps) => {
   });
 
   const ganttTasks = useMemo(() => {
-    console.log("tasks: ", tasks?.[0]);
     return (
       tasks?.map((task) => ({
         start: new Date(task.startDate as string),
@@ -28,7 +27,7 @@ const Timeline = ({ id, setIsModalOpen }: ViewProps) => {
         name: task.title,
         id: `Task-${task.id}`,
         type: "task" as TaskTypeItems,
-        progress: task.points ? (task.points / 10) * 100 : 0,
+        progress: task.points ? task.points : 0,
         isDisabled: false,
       })) || []
     );

@@ -36,10 +36,10 @@ const columns: GridColDef[] = [
     renderCell: (params) => params.value?.username || "Unassigned",
   },
   {
-    field: "progress",
+    field: "points",
     headerName: "Progress",
     width: 75,
-    renderCell: (params) => (params.value?.points / 10) * 100 || 0,
+    renderCell: (params) => `${params.value || 0} %`,
   },
 ];
 
@@ -58,18 +58,14 @@ const Table = ({ id, setIsModalOpen }: ViewProps) => {
   return (
     <div className="h-[540px] w-full px-4 pb-8 xl:px-6">
       <div className="pt-5">
-        <Header
-          name="Table"
-          isSmallText
-          buttonComponent={
-            <button
-              className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
-              onClick={() => setIsModalOpen(true)}
-            >
-              Add Task
-            </button>
-          }
-        />
+        <Header name="Table" isSmallText>
+          <button
+            className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Add Task
+          </button>
+        </Header>
       </div>
 
       <DataGrid

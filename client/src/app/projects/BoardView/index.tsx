@@ -4,6 +4,7 @@ import {
   useDeleteTaskMutation,
   useGetAuthUserQuery,
   useGetTasksQuery,
+  useUpdateTaskPointsMutation,
   useUpdateTaskStatusMutation,
 } from "@/state/api";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -14,7 +15,7 @@ import { format } from "date-fns";
 import { Priority as PriorityTypes } from "@/state/api";
 import Image from "next/image";
 import { ViewProps } from "@/lib/types";
-import { Popover } from "@mui/material";
+import { LinearProgress, Popover } from "@mui/material";
 import ModalComments from "@/components/ModalComments";
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
@@ -77,18 +78,21 @@ const TaskColumn = ({
     drop: (item: { id: number }) => moveTask(item.id, status),
     collect: (monitor) => ({ isOver: !!monitor.isOver() }),
   }));
-  const [columnStats, setColumnStats] = useState(tasks.reduce(
-    (acc, task) => {
-      if (task.status === status) {
-        return {
-          tasksCount: acc.tasksCount + 1,
-          totalCommentsCount: acc.totalCommentsCount + (task.comments?.length || 0),
-        };
-      }
-      return acc;
-    },
-    { tasksCount: 0, totalCommentsCount: 0 },
-  ));
+  const [columnStats, setColumnStats] = useState(
+    tasks.reduce(
+      (acc, task) => {
+        if (task.status === status) {
+          return {
+            tasksCount: acc.tasksCount + 1,
+            totalCommentsCount:
+              acc.totalCommentsCount + (task.comments?.length || 0),
+          };
+        }
+        return acc;
+      },
+      { tasksCount: 0, totalCommentsCount: 0 },
+    ),
+  );
   const statusColor = {
     "To Do": "#2563EB",
     "Work In Progress": "#059669",
@@ -142,7 +146,12 @@ const TaskColumn = ({
       {tasks
         .filter((task) => task.status === status)
         .map((task) => (
-          <Task key={"task-component-" + task.id} task={task} columnStats={columnStats} setColumnStats={setColumnStats}/>
+          <Task
+            key={"task-component-" + task.id}
+            task={task}
+            columnStats={columnStats}
+            setColumnStats={setColumnStats}
+          />
         ))}
     </div>
   );
@@ -151,7 +160,10 @@ const TaskColumn = ({
 type TaskProps = {
   task: TaskType;
   columnStats: { tasksCount: number; totalCommentsCount: number };
-  setColumnStats: (columnStats: { tasksCount: number; totalCommentsCount: number }) => void;
+  setColumnStats: (columnStats: {
+    tasksCount: number;
+    totalCommentsCount: number;
+  }) => void;
 };
 
 const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
@@ -163,8 +175,13 @@ const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
   const { data: currentUser } = useGetAuthUserQuery();
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
+  const [updateTaskPoints] = useUpdateTaskPointsMutation();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [isModalCommentsOpen, setIsModalCommentsOpen] = useState(false);
+  const [isEditingPoints, setIsEditingPoints] = useState(false);
+  const [pointsInput, setPointsInput] = useState(
+    task.points?.toString() || "0",
+  );
 
   const taskTagsSplit = task.tags ? task.tags.split(",") : [];
   const formattedStartDate = task.startDate
@@ -200,6 +217,7 @@ const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
 
   const handleClose = () => {
     setAnchorEl(null);
+    setIsEditingPoints(false);
   };
 
   const handleMarkAsDone = () => {
@@ -218,6 +236,13 @@ const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
         } else {
         }
       });
+  };
+  const handleSavePoints = () => {
+    const newPoints = parseInt(pointsInput);
+    if (!isNaN(newPoints) && newPoints >= 0 && newPoints <= 100) {
+      updateTaskPoints({ taskId: task.id, points: newPoints });
+      handleClose();
+    }
   };
 
   const commentsCount = task.comments?.length || 0;
@@ -288,6 +313,40 @@ const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
                 >
                   Mark as done
                 </button>
+                {isEditingPoints ? (
+                  <div className="flex items-center gap-2 rounded p-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={pointsInput}
+                      onChange={(e) => setPointsInput(e.target.value)}
+                      onBlur={handleSavePoints}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleSavePoints();
+                        }
+                      }}
+                      className="w-16 rounded border px-2 py-1 text-sm outline-none [appearance:textfield] dark:bg-dark-tertiary dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      autoFocus
+                    />
+                    <span className="text-sm">%</span>
+                    <button
+                      className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
+                      onClick={handleSavePoints}
+                    >
+                      Save
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="rounded p-2 transition-colors duration-100 ease-in-out hover:bg-dark-tertiary"
+                    onClick={() => setIsEditingPoints(true)}
+                  >
+                    Edit progress
+                  </button>
+                )}
                 <button
                   className="rounded p-1 text-white transition-colors duration-100 ease-in-out hover:bg-red-500"
                   onClick={handleDeleteTask}
@@ -302,7 +361,7 @@ const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
             <h4 className="text-md font-bold dark:text-white">{task.title}</h4>
             {typeof task.points === "number" && (
               <div className="text-xs font-semibold dark:text-white">
-                {task.points} pts
+                {task.points} %
               </div>
             )}
           </div>
@@ -314,7 +373,12 @@ const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
           <p className="text-sm text-gray-600 dark:text-neutral-500">
             {task.description}
           </p>
-          <div className="mt-4 border-t border-gray-200 dark:border-stroke-dark" />
+
+          <LinearProgress
+            value={task.points || 0}
+            variant="determinate"
+            className="my-5"
+          />
 
           <div className="mt-3 flex items-center justify-between">
             <div className="flex -space-x-[6px] overflow-hidden">
@@ -342,7 +406,7 @@ const Task = ({ task, columnStats, setColumnStats }: TaskProps) => {
             </div>
 
             <button
-              className={`flex items-center text-gray-500 dark:text-neutral-500 transition-[transform, color] duration-200 ease-in-out hover:scale-125 hover:text-blue-500 dark:hover:text-white`}
+              className={`transition-[transform, color] flex items-center text-gray-500 duration-200 ease-in-out hover:scale-125 hover:text-blue-500 dark:text-neutral-500 dark:hover:text-white`}
               onClick={() => setIsModalCommentsOpen(true)}
             >
               <MessageSquareMore size={20} />

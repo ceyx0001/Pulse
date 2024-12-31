@@ -7,35 +7,57 @@ import {
   PlusSquare,
   Share2,
   Table,
+  X,
 } from "lucide-react";
 import React, { useState } from "react";
 import ModalNewProject from "@/components/ModalNewProject";
+import ModalDeleteProject from "@/components/ModalDeleteProject";
 
 type ProjectHeaderProps = {
   activeTab: string;
   setActiveTab: (tabName: string) => void;
+  id: string;
+  name: string;
 };
 
-const ProjectHeader = ({ activeTab, setActiveTab }: ProjectHeaderProps) => {
+const ProjectHeader = ({
+  activeTab,
+  setActiveTab,
+  id,
+  name,
+}: ProjectHeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+
   return (
     <div className="px-4 xl:px-6">
       <ModalNewProject
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+      <ModalDeleteProject
+        isOpen={isModalDeleteOpen}
+        onClose={() => setIsModalDeleteOpen(false)}
+        name={name}
+        id={id}
+      />
       <div className="pb-6 pt-6 lg:pb-4 lg:pt-8">
-        <Header
-          name="Product Design Development"
-          buttonComponent={
+        <Header name="Product Design Development">
+          <div className="flex gap-10">
             <button
               className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
               onClick={() => setIsModalOpen(true)}
             >
               <PlusSquare className="mr-2 h-5 w-5" /> New Boards
             </button>
-          }
-        />
+            <button
+              className="flex items-center rounded-md bg-red-700 px-3 py-2 text-white hover:bg-red-800"
+              onClick={() => setIsModalDeleteOpen(true)}
+            >
+              <X className="mr-2 h-5 w-5" /> Delete {name}
+            </button>
+          </div>
+        </Header>
       </div>
 
       <div className="flex flex-wrap-reverse gap-2 border-y border-gray-200 pb-[8px] pt-2 dark:border-stroke-dark md:items-center">

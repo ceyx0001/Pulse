@@ -40,7 +40,7 @@ const HomePage = () => {
     data: tasks,
     isLoading: tasksLoading,
     isError: tasksError,
-  } = useGetTasksQuery({ projectId: parseInt("1") }); // TODO: set project id to user's favorited project id
+  } = useGetTasksQuery({ projectId: parseInt("1") });
   const { data: projects, isLoading: isProjectsLoading } =
     useGetProjectsQuery();
 

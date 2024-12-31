@@ -48,7 +48,7 @@ const Sidebar = () => {
   };
   if (!currentUser) return null;
   const currentUserDetails = currentUser.userDetails;
-  
+
   return (
     <div className={sidebarClassNames}>
       <div className="flex h-[100%] w-full flex-col justify-start">
@@ -101,7 +101,7 @@ const Sidebar = () => {
               key={"project-sidebar-link-" + project.id}
               icon={Briefcase}
               label={project.name}
-              href={`/projects/${project.id}`}
+              href={`/projects/${project.id}?name=${project.name}`}
             />
           ))}
 
@@ -207,7 +207,10 @@ type SidebarLinkProps = {
 const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   const pathname = usePathname();
   const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard");
+    pathname === href ||
+    (pathname === "/" && href === "/dashboard") ||
+    (href.startsWith("/projects/") &&
+      pathname.split("?")[0] === href.split("?")[0]);
 
   return (
     <Link href={href} className="w-full">
